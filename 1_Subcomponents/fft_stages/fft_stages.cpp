@@ -26,8 +26,8 @@ void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], 
 		const DTYPE s = sin(a);
 		a = a + e;
 
-		for (int i = 0; i < SIZE; i += DFTpts) {
-			const int i_lower = i + 1;
+		for (int i = j; i < SIZE; i += DFTpts) {
+			const int i_lower = i + numBF;
 			const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
 			const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
 
