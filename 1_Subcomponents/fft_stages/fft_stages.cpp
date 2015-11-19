@@ -18,30 +18,25 @@ void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], 
 	
 	const int DFTpts = 1<<stage;
 	const int numBF = DFTpts/2;
+
+#if 0
 	const DTYPE e = -6.283185307178/DFTpts;
 	DTYPE a = 0.0;
-
+#else
 	const int phase_increment = 1024/DFTpts;
 	int p = 0;
-printf("your momma\n");
+#endif
 	for(int j=0; j<numBF; ++j) {
 
 #if 0
 		const DTYPE c = cos(a);
 		const DTYPE s = sin(a);
-#else
-		const int sign = (p >= 512) ? -1 : 1;
-
-		const DTYPE c = W_real[p];
-		const DTYPE c0 = cos(a);
-		printf("%d %f %f %f %f\n", p, a, c, c0, fabs(c-c0));
-		const DTYPE s = sign * W_imag[p];
-		const DTYPE s0 = sin(a);
-		printf("%d %f %f %f %f\n", p, a, s, s0, fabs(s-s0));
-#endif
-
 		a = a + e;
+#else
+		const DTYPE c = W_real[p];
+		const DTYPE s = W_imag[p];
 		p = (p + phase_increment)%512;
+#endif
 		for (int i = j; i < SIZE; i += DFTpts) {
 			const int i_lower = i + numBF;
 			const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
