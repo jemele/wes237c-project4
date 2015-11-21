@@ -14,17 +14,9 @@ const DTYPE bit_swap[] = {0, 512, 256, 768, 128, 640, 384, 896, 64, 576, 320, 83
 
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE]){
 	for(int i = 0; i <SIZE; i++) {
-		int x = (unsigned int)X_R[i];
-		if (x < SIZE) {
-			X_R[i] = bit_swap[x];
-		} else {
-			printf("FAILED X!!!\n");
-		}
-		int y = (unsigned int)X_I[i];
-		if (y < SIZE) {
-			X_R[i] = bit_swap[x];
-		} else {
-			printf("FAILED Y!!!\n");
-		}
+		const int x = (unsigned int)X_R[i];
+		X_R[i] = bit_swap[x];
+		const int y = (unsigned int)X_I[i];
+		X_I[i] = bit_swap[y];
 	}
 }
