@@ -46,22 +46,12 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 }
 
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE]){
-	//Insert your code here
 	for(int i = 0; i <SIZE; i++) {
-		int x = (unsigned int)X_R[i];
-		if (x < SIZE) {
-			X_R[i] = bit_swap[x];
-		} else {
-			printf("FAILED X!!!\n");
-		}
-		int y = (unsigned int)X_I[i];
-		if (y < SIZE) {
-			X_R[i] = bit_swap[x];
-		} else {
-			printf("FAILED Y!!!\n");
-		}
+		const int x = (unsigned int)X_R[i];
+		X_R[i] = bit_swap[x];
+		const int y = (unsigned int)X_I[i];
+		X_R[i] = bit_swap[y];
 	}
-
 }
 /*=======================BEGIN: FFT=========================*/
 //stage 1
