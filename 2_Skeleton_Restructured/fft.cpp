@@ -11,7 +11,7 @@ OUTPUT:
 #include <math.h>
 #include "fft.h"
 
-void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE]);
+void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
 void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
@@ -20,7 +20,9 @@ const DTYPE bit_swap[] = {0, 512, 256, 768, 128, 640, 384, 896, 64, 576, 320, 83
 
 void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 {
-	bit_reverse(X_R, X_I);
+#pragma HLS DATAFLOW
+	DTYPE Bit_R[SIZE], Bit_I[SIZE];
+	bit_reverse(X_R, X_I, Bit_R, Bit_I);
 
 	//Call fft
 	DTYPE Stage1_R[SIZE], Stage1_I[SIZE];
@@ -33,7 +35,7 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 	DTYPE Stage8_R[SIZE], Stage8_I[SIZE];
 	DTYPE Stage9_R[SIZE], Stage9_I[SIZE];
 
-	fft_stage_first(X_R, X_I, Stage1_R, Stage1_I);
+	fft_stage_first(Bit_R, Bit_I, Stage1_R, Stage1_I);
 	fft_stages(Stage1_R, Stage1_I, 2, Stage2_R, Stage2_I);
 	fft_stages(Stage2_R, Stage2_I, 3, Stage3_R, Stage3_I);
 	fft_stages(Stage3_R, Stage3_I, 4, Stage4_R, Stage4_I);
@@ -45,17 +47,20 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 	fft_stage_last(Stage9_R, Stage9_I, OUT_R, OUT_I);
 }
 
-void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE]){
+void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
+#pragma HLS DATAFLOW
 	for(int i = 0; i <SIZE; i++) {
+#pragma HLS PIPELINE enable_flush
 		const int x = (unsigned int)X_R[i];
-		X_R[i] = bit_swap[x];
+		Bit_R[i] = bit_swap[x];
 		const int y = (unsigned int)X_I[i];
-		X_R[i] = bit_swap[y];
+		Bit_I[i] = bit_swap[y];
 	}
 }
 /*=======================BEGIN: FFT=========================*/
 //stage 1
 void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
+#pragma HLS DATAFLOW
 	const int stage = 1;
 	const int DFTpts = 1<<stage;
 	const int numBF = DFTpts/2;
@@ -64,6 +69,7 @@ void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE 
     const DTYPE c = W_real[p];
     const DTYPE s = W_imag[p];
 	for (int i = 0; i < SIZE; i += DFTpts) {
+#pragma HLS PIPELINE enable_flush
 		const int i_lower = i + 1;
 		const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
 		const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
@@ -77,48 +83,55 @@ void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE 
 
 //stages
 void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
+#pragma HLS DATAFLOW
 	const int DFTpts = 1<<stage;
 	const int numBF = DFTpts/2;
 	const int phase_increment = 1024/DFTpts;
 	int p = 0;
-	for (int j=0; j<numBF; ++j) {
-		const DTYPE c = W_real[p];
-		const DTYPE s = W_imag[p];
-		p = (p + phase_increment)%512;
-		for (int i = j; i < SIZE; i += DFTpts) {
-			const int i_lower = i + numBF;
-			const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
-			const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
-
-			OUT_R[i_lower] = X_R[i] - temp_R;
-			OUT_I[i_lower] = X_I[i] - temp_I;
-			OUT_R[i] = X_R[i] + temp_R;
-			OUT_I[i] = X_I[i] + temp_I;
+	int i = 0;
+	int iteration = 0;
+	DTYPE c = W_real[p];
+	DTYPE s = W_imag[p];
+	for (int j=0; j<SIZE2; ++j, i+= DFTpts) {
+#pragma HLS PIPELINE enable_flush
+		if (i >= SIZE) {
+			i = ++iteration;
+			p = (p + phase_increment)%512;
+			c = W_real[p];
+			s = W_imag[p];
 		}
+		const int i_lower = i + numBF;
+		const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
+		const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
+
+		OUT_R[i_lower] = X_R[i] - temp_R;
+		OUT_I[i_lower] = X_I[i] - temp_I;
+		OUT_R[i] = X_R[i] + temp_R;
+		OUT_I[i] = X_I[i] + temp_I;
 	}
 }
 
 //last stage
 void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
-    int stage = 10;
+#pragma HLS DATAFLOW
+	int stage = 10;
     const int DFTpts = 1<<stage;
     const int numBF = DFTpts/2;
     const int phase_increment = 1024/DFTpts;
     int p = 0;
-    for (int j=0; j<numBF; ++j) {
+    for (int i=0; i<SIZE2; ++i) {
+#pragma HLS PIPELINE enable_flush
         const DTYPE c = W_real[p];
         const DTYPE s = W_imag[p];
         p = (p + phase_increment)%512;
-        for (int i = j; i < SIZE; i += DFTpts) {
-            const int i_lower = i + numBF;
-            const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
-            const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
+		const int i_lower = i + numBF;
+		const DTYPE temp_R = X_R[i_lower]*c- X_I[i_lower]*s;
+		const DTYPE temp_I = X_I[i_lower]*c+ X_R[i_lower]*s;
 
-            OUT_R[i_lower] = X_R[i] - temp_R;
-            OUT_I[i_lower] = X_I[i] - temp_I;
-            OUT_R[i] = X_R[i] + temp_R;
-            OUT_I[i] = X_I[i] + temp_I;
-        }
+		OUT_R[i_lower] = X_R[i] - temp_R;
+		OUT_I[i_lower] = X_I[i] - temp_I;
+		OUT_R[i] = X_R[i] + temp_R;
+		OUT_I[i] = X_I[i] + temp_I;
     }
 }
 /*=======================END: FFT=========================*/
