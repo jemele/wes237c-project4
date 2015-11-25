@@ -23,7 +23,9 @@ static unsigned int reverse(register unsigned int x)
 
 // XXX describe this function, please
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
+#pragma HLS dataflow
 	for (unsigned int i = 0; i <SIZE; i++) {
+#pragma HLS pipeline enable_flush
         const unsigned int reversed_i = reverse(i);
         Bit_R[reversed_i] = X_R[i];
         Bit_I[reversed_i] = X_I[i];

@@ -45,8 +45,32 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 	fft_stage_last(Stage9_R, Stage9_I, OUT_R, OUT_I);
 }
 
+inline unsigned int reverse(unsigned int x)
+{
+    x = (((x & 0xaaaaaaaa) >> 1) | ((x & 0x55555555) << 1));
+    x = (((x & 0xcccccccc) >> 2) | ((x & 0x33333333) << 2));
+    x = (((x & 0xf0f0f0f0) >> 4) | ((x & 0x0f0f0f0f) << 4));
+    x = (((x & 0xff00ff00) >> 8) | ((x & 0x00ff00ff) << 8));
+    x = ((x >> 16) | (x << 16));
+
+    const unsigned shift = (sizeof(x)*8) - M;
+    return x >> shift;
+}
+
+// XXX describe this function, please
+void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
+#pragma HLS dataflow
+	for (unsigned int i = 0; i <SIZE; i++) {
+#pragma HLS pipeline enable_flush
+        const unsigned int reversed_i = reverse(i);
+        Bit_R[reversed_i] = X_R[i];
+        Bit_I[reversed_i] = X_I[i];
+	}
+}
+
+#if 0
 // Reverse the bits of the input, assuming a 10-bit input.
-static unsigned int reverse(register unsigned int x)
+static unsigned int reverse(unsigned int x)
 {
     static const unsigned final_shift = ((sizeof(x)*8) - M);
     x = (((x & 0xaaaaaaaa) >> 1) | ((x & 0x55555555) << 1));
@@ -58,14 +82,20 @@ static unsigned int reverse(register unsigned int x)
 
 // XXX describe this function, please
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
-#pragma HLS DATAFLOW
-	for (unsigned int i = 0; i <SIZE; i++) {
+#pragma HLS dataflow
+	for (unsigned int i = 0; i <SIZE; ++i) {
 #pragma HLS PIPELINE enable_flush
-        const unsigned int reversed_i = reverse(i);
-        Bit_R[reversed_i] = X_R[i];
-        Bit_I[reversed_i] = X_I[i];
+	    i = (((i & 0xaaaaaaaa) >> 1) | ((i & 0x55555555) << 1));
+	    i = (((i & 0xcccccccc) >> 2) | ((i & 0x33333333) << 2));
+	    i = (((i & 0xf0f0f0f0) >> 4) | ((i & 0x0f0f0f0f) << 4));
+	    i = (((i & 0xff00ff00) >> 8) | ((i & 0x00ff00ff) << 8));
+	    const unsigned int reversed_i = ((i >> 16) | (i << 16)) >> 22;
+        //const unsigned int reversed_i = reverse(i);
+        Bit_R[i] = X_R[reversed_i];
+        Bit_I[i] = X_I[reversed_i];
 	}
 }
+#endif
 
 /*=======================BEGIN: FFT=========================*/
 //stage 1
