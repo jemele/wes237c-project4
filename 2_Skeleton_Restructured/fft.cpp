@@ -11,10 +11,10 @@ OUTPUT:
 #include <math.h>
 #include "fft.h"
 
-static void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
-static void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-static void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-static void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
+void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 
 void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 {
@@ -46,7 +46,7 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 }
 
 // Reverse the bits of the input, assuming a 10-bit input.
-unsigned int reverse(register unsigned int x)
+static unsigned int reverse(register unsigned int x)
 {
     x = (((x & 0xaaaaaaaa) >> 1) | ((x & 0x55555555) << 1));
     x = (((x & 0xcccccccc) >> 2) | ((x & 0x33333333) << 2));
