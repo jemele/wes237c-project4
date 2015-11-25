@@ -12,6 +12,8 @@ OUTPUT:
 #include "bit_reverse.h"
 
 DTYPE In_R[SIZE], In_I[SIZE];
+DTYPE Out_R[SIZE], Out_I[SIZE];
+
 
 int main()
 {
@@ -20,16 +22,14 @@ int main()
 	{
 		In_R[i] = i;
 		In_I[i] = 0.0;
-
 	}
 	//Perform Bit Reverse
-	bit_reverse(In_R, In_I);
+	bit_reverse(In_R, In_I, Out_R, Out_I);
 
 	fp=fopen("out.dat", "w");
 	printf("Printing bit reverse output\n");
 	for(int i=0; i<SIZE; i++){
-		printf("%d, %f, %f\n",i,In_R[i], In_I[i]);
-		fprintf(fp, "%d, %f, %f\n",i,In_R[i], In_I[i]);
+		fprintf(fp, "%d, %f, %f\n",i,Out_R[i],Out_I[i]);
 	}
 
 	fclose(fp);

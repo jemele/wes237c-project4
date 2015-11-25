@@ -24,8 +24,8 @@ static unsigned int reverse(register unsigned int x)
 // XXX describe this function, please
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
 	for (unsigned int i = 0; i <SIZE; i++) {
-        const unsigned int reversed_i = bit_reverse(i);
-        Bit_R[reversed_i] = Bit_R[i];
-        BiT_I[reversed_i] = Bit_I[i];
+        const unsigned int reversed_i = reverse(i);
+        Bit_R[reversed_i] = X_R[i];
+        Bit_I[reversed_i] = X_I[i];
 	}
 }

@@ -8,6 +8,6 @@ typedef int INTTYPE;
 #define M 10			/* Number of Stages = Log2N */
 
 
-void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE]);
+void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 
 #endif
