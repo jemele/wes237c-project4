@@ -14,4 +14,4 @@ set_part  {xc7z020clg484-1}
 create_clock -period 10
 
 source "./directives.tcl"
-##csynth_design
+csynth_design
