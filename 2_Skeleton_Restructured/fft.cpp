@@ -43,6 +43,24 @@ void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 	fft_stages(Stage7_R, Stage7_I, 8, Stage8_R, Stage8_I);
 	fft_stages(Stage8_R, Stage8_I, 9, Stage9_R, Stage9_I);
 	fft_stage_last(Stage9_R, Stage9_I, OUT_R, OUT_I);
+
+    // Decode output ...
+    unsigned int symbol[SIZE];
+    for (int i = 0; i < SIZE; ++i) {
+        if (OUT_R[i] > 0) {
+            if (OUT_I[i] > 0) {
+                symbol[i] = 0;
+            } else {
+                symbol[i] = 2;
+            }
+        } else {
+            if (OUT_I[i] > 0) {
+                symbol[i] = 1;
+            } else {
+                symbol[i] = 3;
+            }
+        }
+    }
 }
 
 inline unsigned int reverse(unsigned int x)
