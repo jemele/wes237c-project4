@@ -29,7 +29,6 @@ int main()
 		//printf("%4d\t%f\t%f\n",i,Out_R[i],Out_I[i]);
 		fprintf(fp, "%4d\t%f\t%f\n",i,Out_R[i],Out_I[i]);
 	}
-
 	fclose(fp);
 
 	//Check against golden output.
@@ -38,14 +37,11 @@ int main()
 	fprintf(stdout, "*******************************************\n");
 	fprintf(stdout, "FAIL: Output DOES NOT match the golden output\n");
 	fprintf(stdout, "*******************************************\n");
-     return 0;
   } else {
 	fprintf(stdout, "*******************************************\n");
 	fprintf(stdout, "PASS: The output matches the golden output!\n");
 	fprintf(stdout, "*******************************************\n");
-     return 0;
   }
-
 
     // Validate ofdm test vector.
     // Input gold_i/q into the fft.
@@ -53,9 +49,10 @@ int main()
     unsigned int symbols[SIZE];
     ofdm_receiver(gold_i, gold_q, symbols);
     for (int i = 0; i < SIZE; ++i) {
-        if (symbols[i] != gold_symbols[i]) {
+    	printf("%d %d\n", symbols[i], gold_symbols[i]);
+    	if (symbols[i] != gold_symbols[i]) {
             printf("symbol error %d %d\n", symbols[i], gold_symbols[i]);
         }
     }
-
+    return 0;
 }
