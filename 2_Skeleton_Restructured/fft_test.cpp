@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fft.h"
+#include "ofdm_test_vector.h"
 
 DTYPE In_R[SIZE], In_I[SIZE];
 DTYPE Out_R[SIZE], Out_I[SIZE];
@@ -37,12 +38,24 @@ int main()
 	fprintf(stdout, "*******************************************\n");
 	fprintf(stdout, "FAIL: Output DOES NOT match the golden output\n");
 	fprintf(stdout, "*******************************************\n");
-     return 1;
+     return 0;
   } else {
 	fprintf(stdout, "*******************************************\n");
 	fprintf(stdout, "PASS: The output matches the golden output!\n");
 	fprintf(stdout, "*******************************************\n");
      return 0;
   }
+
+
+    // Validate ofdm test vector.
+    // Input gold_i/q into the fft.
+    // Verify the gold symbols match fft output.
+    unsigned int symbols[SIZE];
+    ofdm_receiver(gold_i, gold_q, symbols);
+    for (int i = 0; i < SIZE; ++i) {
+        if (symbols[i] != gold_symbols[i]) {
+            printf("symbol error %d %d\n", symbols[i], gold_symbols[i]);
+        }
+    }
 
 }
