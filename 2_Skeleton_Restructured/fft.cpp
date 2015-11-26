@@ -11,11 +11,13 @@ OUTPUT:
 #include <math.h>
 #include "fft.h"
 
-void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
-void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-void ofdm_receiver(DTYPE X_R[SIZE], DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
+void bit_reverse(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
+void fft_stage_first(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void fft_stages(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+
+
+void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
 {
 #pragma HLS DATAFLOW
     DTYPE OUT_R[SIZE], OUT_I[SIZE];
@@ -41,7 +43,7 @@ void ofdm_receiver(DTYPE X_R[SIZE], DTYPE X_I[SIZE], unsigned int output_symbols
 
 }
 
-void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
+void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
 {
 #pragma HLS DATAFLOW
 	DTYPE Bit_R[SIZE], Bit_I[SIZE];
@@ -83,7 +85,7 @@ inline unsigned int reverse(unsigned int x)
 }
 
 // XXX describe this function, please
-void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
+void bit_reverse(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]){
 #pragma HLS dataflow
 	for (unsigned int i = 0; i <SIZE; i++) {
 #pragma HLS pipeline enable_flush
@@ -95,7 +97,7 @@ void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_
 
 /*=======================BEGIN: FFT=========================*/
 //stage 1
-void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
+void fft_stage_first(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
 #pragma HLS DATAFLOW
 	const int stage = 1;
 	const int DFTpts = 1<<stage;
@@ -118,7 +120,7 @@ void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE 
 }
 
 //stages
-void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
+void fft_stages(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
 #pragma HLS DATAFLOW
 	const int DFTpts = 1<<stage;
 	const int numBF = DFTpts/2;
@@ -148,7 +150,7 @@ void fft_stages(DTYPE X_R[SIZE], DTYPE X_I[SIZE], int stage, DTYPE OUT_R[SIZE], 
 }
 
 //last stage
-void fft_stage_last(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
+void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]) {
 #pragma HLS DATAFLOW
 	int stage = 10;
     const int DFTpts = 1<<stage;

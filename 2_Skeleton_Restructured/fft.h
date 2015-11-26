@@ -79,7 +79,7 @@ const DTYPE W_imag[]={-0.000000,-0.006136,-0.012272,-0.018407,-0.024541,-0.03067
 
 
 
-void fft(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
-void ofdm_receiver(DTYPE X_R[SIZE], DTYPE X_I[SIZE], unsigned int output_symbols[SIZE]);
+void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE]);
 
 #endif
