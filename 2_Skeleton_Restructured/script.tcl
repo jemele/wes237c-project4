@@ -7,6 +7,7 @@ open_project hls_restructured
 set_top fft
 add_files fft.cpp
 add_files fft.h
+add_files ofdm_test_vector.h
 add_files -tb fft_test.cpp
 add_files -tb out.gold.dat
 open_solution "solution1"
