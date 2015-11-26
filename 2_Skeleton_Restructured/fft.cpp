@@ -16,7 +16,6 @@ void fft_stage_first(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[S
 void fft_stages(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 
-
 void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
 {
 #pragma HLS dataflow
@@ -40,7 +39,6 @@ void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int ou
             }
         }
     }
-
 }
 
 void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])

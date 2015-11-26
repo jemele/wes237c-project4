@@ -42,4 +42,12 @@ for i = 1:length(input_q)
 end
 fprintf(f,'};\n');
 
+% write out interleaved i/q
+fprintf(f,'const DTYPE gold_iq[] = {');
+for i = 1:length(input_q)
+    fprintf(f,'%f,%f,',input_i(i), input_q(i));
+end
+fprintf(f,'};\n');
+
+
 fclose(f)
