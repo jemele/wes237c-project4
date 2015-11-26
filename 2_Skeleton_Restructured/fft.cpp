@@ -10,6 +10,7 @@ OUTPUT:
 #include <stdio.h>
 #include <math.h>
 #include "fft.h"
+#include "ofdm_test_vector.h"
 
 void bit_reverse(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
 void fft_stage_first(DTYPE X_R[SIZE], DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
