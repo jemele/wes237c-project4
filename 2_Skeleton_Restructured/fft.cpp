@@ -19,13 +19,13 @@ void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SI
 
 void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
 {
-#pragma HLS DATAFLOW
+#pragma HLS dataflow
     DTYPE OUT_R[SIZE], OUT_I[SIZE];
     fft(X_R, X_I, OUT_R, OUT_I);
 
     // Decode output (qpsk gray coded)
     for (int i = 0; i < SIZE; ++i) {
-#pragma HLS DATAFLOW
+#pragma HLS pipeline enable_flush
         if (OUT_R[i] > 0) {
             if (OUT_I[i] > 0) {
                 output_symbols[i] = 0;
