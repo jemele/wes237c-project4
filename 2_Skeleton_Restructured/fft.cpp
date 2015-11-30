@@ -11,43 +11,19 @@ OUTPUT:
 #include <math.h>
 #include "fft.h"
 
+void ofdm(const DTYPE input[SIZE*2], unsigned int output[SIZE]);
+void demultiplex_input(const DTYPE input[SIZE], DTYPE X_R[SIZE], DTYPE X_I[SIZE]);
 void bit_reverse(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE Bit_R[SIZE], DTYPE Bit_I[SIZE]);
 void fft_stage_first(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void fft_stages(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], int STAGES, DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
+void qpsk_decoder(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE]);
 
-void ofdm_receiver(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
-{
-#pragma HLS dataflow
-    DTYPE OUT_R[SIZE], OUT_I[SIZE];
-    fft(X_R, X_I, OUT_R, OUT_I);
-
-    // Decode output (qpsk gray coded)
-    for (int i = 0; i < SIZE; ++i) {
-#pragma HLS pipeline enable_flush
-        if (OUT_R[i] > 0) {
-            if (OUT_I[i] > 0) {
-                output_symbols[i] = 0;
-            } else {
-                output_symbols[i] = 2;
-            }
-        } else {
-            if (OUT_I[i] > 0) {
-                output_symbols[i] = 1;
-            } else {
-                output_symbols[i] = 3;
-            }
-        }
-    }
-}
-
-void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE])
+void ofdm(const DTYPE input_iq[SIZE*2], unsigned int output_symbols[SIZE])
 {
 #pragma HLS DATAFLOW
+    DTYPE X_R[SIZE], X_I[SIZE];
 	DTYPE Bit_R[SIZE], Bit_I[SIZE];
-	bit_reverse(X_R, X_I, Bit_R, Bit_I);
-
-	//Call fft
 	DTYPE Stage1_R[SIZE], Stage1_I[SIZE];
 	DTYPE Stage2_R[SIZE], Stage2_I[SIZE];
 	DTYPE Stage3_R[SIZE], Stage3_I[SIZE];
@@ -57,7 +33,10 @@ void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE 
 	DTYPE Stage7_R[SIZE], Stage7_I[SIZE];
 	DTYPE Stage8_R[SIZE], Stage8_I[SIZE];
 	DTYPE Stage9_R[SIZE], Stage9_I[SIZE];
+	DTYPE OUT_R[SIZE], OUT_I[SIZE];
 
+    demultiplex_input(input_iq, X_R, X_I);
+	bit_reverse(X_R, X_I, Bit_R, Bit_I);
 	fft_stage_first(Bit_R, Bit_I, Stage1_R, Stage1_I);
 	fft_stages(Stage1_R, Stage1_I, 2, Stage2_R, Stage2_I);
 	fft_stages(Stage2_R, Stage2_I, 3, Stage3_R, Stage3_I);
@@ -68,6 +47,17 @@ void fft(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE 
 	fft_stages(Stage7_R, Stage7_I, 8, Stage8_R, Stage8_I);
 	fft_stages(Stage8_R, Stage8_I, 9, Stage9_R, Stage9_I);
 	fft_stage_last(Stage9_R, Stage9_I, OUT_R, OUT_I);
+    qpsk_decoder(OUT_R, OUT_I, output_symbols);
+}
+
+void demultiplex_input(const DTYPE input_iq[SIZE*2], DTYPE X_R[SIZE], DTYPE X_I[SIZE])
+{
+#pragma HLS DATAFLOW
+    for (int i = 0; i < SIZE; ++i) {
+#pragma HLS PIPELINE enable_flush
+        X_R[i] = input_iq[(i*2)];
+        X_I[i] = input_iq[(i*2)+1];
+    }
 }
 
 inline unsigned int reverse(unsigned int x)
@@ -170,4 +160,18 @@ void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SI
 		OUT_I[i] = X_I[i] + temp_I;
     }
 }
-/*=======================END: FFT=========================*/
+
+void qpsk_decoder(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE])
+{
+#pragma HLS DATAFLOW
+    for (int i = 0; i < SIZE; ++i) {
+#pragma HLS PIPELINE enable_flush
+        unsigned int symbol_select[] = {1, 3};
+        if (X_R[i] > 0) {
+            symbol_select[0] = 0;
+            symbol_select[1] = 2;
+        }
+        output_symbols[i] = (X_I[i] > 0) ? (symbol_select[0]):(symbol_select[1]);
+
+    }
+}

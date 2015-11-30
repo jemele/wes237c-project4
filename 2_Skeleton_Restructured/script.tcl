@@ -4,7 +4,7 @@
 ## Copyright (C) 2012 Xilinx Inc. All rights reserved.
 ############################################################
 open_project hls_restructured
-set_top ofdm_receiver
+set_top ofdm
 add_files fft.cpp
 add_files fft.h
 add_files ofdm_test_vector.h

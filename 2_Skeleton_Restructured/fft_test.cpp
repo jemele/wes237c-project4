@@ -9,6 +9,7 @@ DTYPE Out_R[SIZE], Out_I[SIZE];
 
 int main()
 {
+#if 0
 	FILE *fp;
 
 	//Generate input data
@@ -42,12 +43,12 @@ int main()
 	fprintf(stdout, "PASS: The output matches the golden output!\n");
 	fprintf(stdout, "*******************************************\n");
   }
-
+#endif
     // Validate ofdm test vector.
     // Input gold_i/q into the fft.
     // Verify the gold symbols match fft output.
     unsigned int symbols[SIZE];
-    ofdm_receiver(gold_i, gold_q, symbols);
+    ofdm(gold_iq, symbols);
     for (int i = 0; i < SIZE; ++i) {
     	printf("%d %d\n", symbols[i], gold_symbols[i]);
     	if (symbols[i] != gold_symbols[i]) {
