@@ -170,7 +170,6 @@ void qpsk_decoder(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int out
 #pragma HLS DATAFLOW
     for (int i = 0; i < SIZE; ++i) {
 #pragma HLS PIPELINE enable_flush
-        unsigned int symbol_select[] = {1, 3};
         if (X_R[i] > 0) {
         	if (X_I[i] > 0) {
         		output_symbols[i] = 0;
