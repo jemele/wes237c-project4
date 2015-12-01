@@ -36,9 +36,10 @@ int main(int argc, char **argv)
     }
     int i;
     for (i = 0; i < sizeof(out)/sizeof(*out); ++i) {
-        fprintf(ifile, "%f,", gold_i[i]);
-        fprintf(qfile, "%f,", gold_q[i]);
-        fprintf(ofile, "%d,", out[i]);
+        const int j = i + 1;
+        fprintf(ifile, "%d %f\n", j, gold_i[i]);
+        fprintf(qfile, "%d %f\n", j, gold_q[i]);
+        fprintf(ofile, "%d %d\n", j, out[i]);
     }
     fclose(ifile); ifile = 0;
     fclose(qfile); qfile = 0;
