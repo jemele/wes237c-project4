@@ -1,7 +1,7 @@
 #include "xilly_debug.h"
 
 volatile char debug_out;
-volatile char debug_ready;
+volatile char debug_ready = 1;
 
 void xilly_puts(const char *str) {
   while (*str) {

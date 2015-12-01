@@ -10,6 +10,7 @@ OUTPUT:
 #include <stdio.h>
 #include <math.h>
 #include "fft.h"
+#include "xilly_debug.h"
 
 void ofdm(const DTYPE input[SIZE*2], unsigned int output[SIZE]);
 void demultiplex_input(const DTYPE input[SIZE], DTYPE X_R[SIZE], DTYPE X_I[SIZE]);
@@ -25,6 +26,7 @@ void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
 #pragma AP interface ap_fifo port=out
 #pragma AP interface ap_ctrl_none port=return
 
+	xilly_puts("hello world");
     DTYPE X_R[SIZE], X_I[SIZE];
 	DTYPE Bit_R[SIZE], Bit_I[SIZE];
 	DTYPE Stage1_R[SIZE], Stage1_I[SIZE];
