@@ -5,16 +5,11 @@
 ############################################################
 open_project hls
 set_top ofdm
-add_files fft.cpp
-add_files fft.h
-add_files xilly_debug.h
-add_files xilly_debug.cpp
-add_files ofdm_test_vector.h
-add_files -tb fft_test.cpp
-add_files -tb out.gold.dat
+add_files fft.c
+add_files xilly_debug.c
 open_solution "solution1"
 set_part  {xc7z020clg484-1}
 create_clock -period 10
-
-source "./directives.tcl"
+config_interface -all ap_fifo -expose_global
+source "directives.tcl"
 csynth_design

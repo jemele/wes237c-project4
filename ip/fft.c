@@ -26,7 +26,6 @@ void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
 #pragma AP interface ap_fifo port=out
 #pragma AP interface ap_ctrl_none port=return
 
-	xilly_puts("hello world");
     DTYPE X_R[SIZE], X_I[SIZE];
 	DTYPE Bit_R[SIZE], Bit_I[SIZE];
 	DTYPE Stage1_R[SIZE], Stage1_I[SIZE];
@@ -40,6 +39,7 @@ void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
 	DTYPE Stage9_R[SIZE], Stage9_I[SIZE];
 	DTYPE OUT_R[SIZE], OUT_I[SIZE];
 
+	xilly_puts("hello world");
     demultiplex_input(in, X_R, X_I);
 	bit_reverse(X_R, X_I, Bit_R, Bit_I);
 	fft_stage_first(Bit_R, Bit_I, Stage1_R, Stage1_I);
