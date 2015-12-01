@@ -16,3 +16,4 @@ create_clock -period 10
 
 source "./directives.tcl"
 csynth_design
+cosim_design
