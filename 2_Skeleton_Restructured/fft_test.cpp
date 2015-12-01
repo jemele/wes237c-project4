@@ -48,7 +48,7 @@ int main()
     // Input gold_i/q into the fft.
     // Verify the gold symbols match fft output.
     unsigned int symbols[SIZE];
-    ofdm(gold_iq, symbols);
+    ofdm(gold_i, gold_q, symbols);
     for (int i = 0; i < SIZE; ++i) {
     	printf("%d %d\n", symbols[i], gold_symbols[i]);
     	if (symbols[i] != gold_symbols[i]) {

@@ -19,14 +19,13 @@ void fft_stages(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], int STAGES, DTYPE 
 void fft_stage_last(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], DTYPE OUT_R[SIZE], DTYPE OUT_I[SIZE]);
 void qpsk_decoder(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int output_symbols[SIZE]);
 
-void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
+void ofdm(const DTYPE X_R[SIZE], const DTYPE X_I[SIZE], unsigned int out[SIZE])
 {
 #pragma AP interface ap_fifo port=in
 #pragma AP interface ap_fifo port=out
 #pragma AP interface ap_ctrl_none port=return
 
 #pragma HLS DATAFLOW
-    DTYPE X_R[SIZE], X_I[SIZE];
 	DTYPE Bit_R[SIZE], Bit_I[SIZE];
 	DTYPE Stage1_R[SIZE], Stage1_I[SIZE];
 	DTYPE Stage2_R[SIZE], Stage2_I[SIZE];
@@ -39,7 +38,6 @@ void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
 	DTYPE Stage9_R[SIZE], Stage9_I[SIZE];
 	DTYPE OUT_R[SIZE], OUT_I[SIZE];
 
-    demultiplex_input(in, X_R, X_I);
 	bit_reverse(X_R, X_I, Bit_R, Bit_I);
 	fft_stage_first(Bit_R, Bit_I, Stage1_R, Stage1_I);
 	fft_stages(Stage1_R, Stage1_I, 2, Stage2_R, Stage2_I);
@@ -52,16 +50,6 @@ void ofdm(const DTYPE in[SIZE*2], unsigned int out[SIZE])
 	fft_stages(Stage8_R, Stage8_I, 9, Stage9_R, Stage9_I);
 	fft_stage_last(Stage9_R, Stage9_I, OUT_R, OUT_I);
     qpsk_decoder(OUT_R, OUT_I, out);
-}
-
-void demultiplex_input(const DTYPE input_iq[SIZE*2], DTYPE X_R[SIZE], DTYPE X_I[SIZE])
-{
-#pragma HLS DATAFLOW
-    for (int i = 0; i < SIZE; ++i) {
-#pragma HLS PIPELINE enable_flush
-        X_R[i] = input_iq[(i*2)];
-        X_I[i] = input_iq[(i*2)+1];
-    }
 }
 
 inline unsigned int reverse(unsigned int x)
